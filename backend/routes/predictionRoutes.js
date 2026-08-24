@@ -4,13 +4,14 @@ import {
   predictionHistory,
   allPredictions
 } from "../controllers/predictionController.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/", allPredictions);
+router.get("/", protect, authorize("admin", "employee"), allPredictions);
 
-router.post("/", runPrediction);
+router.post("/", protect, authorize("admin", "employee"), runPrediction);
 
-router.get("/:customerId", predictionHistory);
+router.get("/:customerId", protect, predictionHistory);
 
 export default router;

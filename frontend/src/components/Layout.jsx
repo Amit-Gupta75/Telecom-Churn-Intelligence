@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 
-export default function Layout({children}) {
+export default function Layout() {
 
   const [open,setOpen] = useState(true);
 
@@ -22,7 +23,7 @@ export default function Layout({children}) {
           : "main-area expanded"
         }
       >
-        {children}
+        <Outlet />
       </main>
 
 
