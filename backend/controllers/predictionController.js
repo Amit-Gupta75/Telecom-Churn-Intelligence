@@ -2,6 +2,7 @@ import axios from "axios";
 import Customer from "../models/Customer.js";
 import Prediction from "../models/Prediction.js";
 
+
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
 // POST /api/predictions  — forwards the customer profile to the Python AI
@@ -57,5 +58,20 @@ export const predictionHistory = async (req, res) => {
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const allPredictions = async (req, res) => {
+  try {
+    const predictions = await Prediction.find()
+      .sort({ createdAt: -1 });
+
+    res.json(predictions);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
   }
 };
