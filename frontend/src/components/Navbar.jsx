@@ -19,7 +19,7 @@ function timeAgo(iso) {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export default function Navbar() {
+export default function Navbar({open,setOpen}) {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -34,15 +34,9 @@ export default function Navbar() {
   const model = stats?.model?.trained ? stats.model : null;
 
   return (
+    <>
     <aside
-      style={{
-        background: "var(--signal-deep)",
-        color: "#fff",
-        padding: "24px 18px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 28
-      }}
+    className={`sidebar ${open ? "" : "closed"}`}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 6px" }}>
         <span className="signal-bars" style={{ color: "var(--risk-low)" }}>
@@ -93,6 +87,23 @@ export default function Navbar() {
           <div style={{ fontSize: 11.5, opacity: 0.6 }}>Model not trained yet</div>
         )}
       </div>
+      
     </aside>
+
+    <button
+      className="sidebar-arrow"
+      onClick={()=>setOpen(!open)}
+      >
+
+      {
+      open
+      ?
+      "‹"
+      :
+      "›"
+      }
+
+      </button>
+        </>
   );
 }

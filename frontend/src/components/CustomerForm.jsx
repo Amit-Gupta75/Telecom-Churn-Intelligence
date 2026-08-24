@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Zap } from "lucide-react";
  
 const initial = {
@@ -22,11 +22,40 @@ const initial = {
   multipleLines: "No"
 };
  
-export default function CustomerForm({ onSubmit, loading }) {
-  const [form, setForm] = useState(initial);
- 
-  const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
- 
+export default function CustomerForm({customer,setCustomer,onSubmit,
+  loading,
+  mode = "create"
+}) {
+  const [form, setForm] = useState(customer || initial); 
+  useEffect(() => {
+
+  if(customer){
+    setForm(customer);
+  }
+
+},[customer]);
+
+
+
+const update = (key) => (e) => {
+
+const value = e.target.value;
+
+setForm((f)=>({
+ ...f,
+ [key]:value
+}));
+
+if(setCustomer){
+
+ setCustomer((f)=>({
+   ...f,
+   [key]:value
+ }));
+
+}
+
+};
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(form);
@@ -172,7 +201,17 @@ export default function CustomerForm({ onSubmit, loading }) {
  
       <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: 20, width: "100%", justifyContent: "center" }}>
         <Zap size={16} />
-        {loading ? "Predicting…" : "Predict churn risk"}
+        {
+          loading
+          ?
+          "Saving..."
+          :
+          mode==="edit"
+          ?
+          "Update customer"
+          :
+          "Predict churn risk"
+          }
       </button>
     </form>
   );
