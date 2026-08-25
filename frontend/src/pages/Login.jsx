@@ -48,23 +48,14 @@ const data = await loginUser(form);
 
 
 login(data);
-
-
-
-if(data.user.role==="admin"){
-
+if (data.user.role === "admin") {
   navigate("/admin");
-
-}
-else if(data.user.role==="employee"){
-
+} else if (data.user.role === "employee") {
   navigate("/employee");
-
-}
-else{
-
-  navigate("/");
-
+} else if (data.user.role === "customer") {
+  navigate("/customer");
+} else {
+  setError("Unknown user role");
 }
 
 }catch(err){

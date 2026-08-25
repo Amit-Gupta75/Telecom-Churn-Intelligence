@@ -54,6 +54,10 @@ export const runPrediction = async (req, res) => {
 
 export const predictionHistory = async (req, res) => {
   try {
+    if (req.user.role === "customer" && String(req.user.customer) !== req.params.customerId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const history = await Prediction.find({ customer: req.params.customerId }).sort({ createdAt: -1 });
     res.json(history);
   } catch (err) {
@@ -65,7 +69,8 @@ export const predictionHistory = async (req, res) => {
 export const allPredictions = async (req, res) => {
   try {
     const predictions = await Prediction.find()
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("customer", "name location");
 
     res.json(predictions);
 

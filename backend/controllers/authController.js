@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import Customer from "../models/Customer.js";
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -25,7 +25,6 @@ const {
 name,
 email,
 password,
-role,
 location,
 region
 }=req.body;
@@ -43,11 +42,15 @@ message:"User already exists"
 const hashedPassword = await bcrypt.hash(password,10);
 
 
+// Public registration always creates a "customer" role account.
+// Admin and employee accounts can only be created through the
+// protected /api/users/employees routes — role is never trusted
+// from the request body here.
 const user = await User.create({
 name,
 email,
 password:hashedPassword,
-role: role || "customer",
+role: "customer",
 location,
 region
 });
@@ -62,7 +65,8 @@ name:user.name,
 email:user.email,
 role:user.role,
 location:user.location,
-region:user.region
+region:user.region,
+customer:user.customer
 }
 });
 
@@ -89,41 +93,69 @@ password
 }=req.body;
 
 
-const user = await User.findOne({email});
+// First check User collection
+
+let account = await User.findOne({email});
 
 
-if(!user){
+
+
+// If not found check Customer collection
+if(!account){
+
+account = await Customer.findOne({email});
+
+
+}
+
+
+if(!account){
+
 return res.status(401).json({
 message:"Invalid credentials"
 });
+
 }
+
 
 
 const match = await bcrypt.compare(
 password,
-user.password
+account.password
 );
 
 
+
 if(!match){
+
 return res.status(401).json({
 message:"Invalid credentials"
 });
+
 }
+
+
 
 
 
 res.json({
 
-token:generateToken(user),
+token:generateToken(account),
 
 user:{
-id:user._id,
-name:user.name,
-email:user.email,
-role:user.role,
-location:user.location,
-region:user.region
+
+id:account._id,
+
+name:account.name,
+
+email:account.email,
+
+role:account.role,
+
+location:account.location,
+
+region:account.region
+
 }
 
 });
@@ -138,7 +170,6 @@ message:error.message
 }
 
 };
-
 
 
 export const getMe = async(req,res)=>{

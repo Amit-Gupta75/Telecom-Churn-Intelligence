@@ -4,13 +4,17 @@ import {
   predictionHistory,
   allPredictions
 } from "../controllers/predictionController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
-router.get("/", allPredictions);
+router.get("/", protect, authorize("admin", "employee"), allPredictions);
 
-router.post("/", runPrediction);
+router.post("/", protect, authorize("admin", "employee"), runPrediction);
 
-router.get("/:customerId", predictionHistory);
+// Admin/employee can view any customer's history; a customer can only
+// view their own (enforced inside the controller).
+router.get("/:customerId", protect, authorize("admin", "employee", "customer"), predictionHistory);
 
 export default router;

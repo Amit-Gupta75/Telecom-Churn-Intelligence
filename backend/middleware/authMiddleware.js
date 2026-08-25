@@ -1,49 +1,67 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Customer from "../models/Customer.js";
 
+export const protect = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
 
-export const protect = async(req,res,next)=>{
+    if (!token) {
+      return res.status(401).json({
+        message: "No token"
+      });
+    }
 
-try{
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "secretkey"
+    );
 
-const token = req.headers.authorization?.split(" ")[1];
+    let user;
 
+    // Customer accounts are stored in Customer collection.
+    if (decoded.role === "customer") {
+      user = await Customer.findById(decoded.id)
+        .select("-password");
 
-if(!token){
-return res.status(401).json({
-message:"No token"
-});
-}
+      if (!user) {
+        return res.status(401).json({
+          message: "Customer not found"
+        });
+      }
 
+      // Keep the role available to authorize()
+      user = {
+        ...user.toObject(),
+        role: "customer"
+      };
+    } else {
+      // Admin / employee accounts are stored in User collection.
+      user = await User.findById(decoded.id)
+        .select("-password");
 
-const decoded = jwt.verify(
-token,
-process.env.JWT_SECRET || "secretkey"
-);
+      if (!user) {
+        return res.status(401).json({
+          message: "User not found"
+        });
+      }
+    }
 
+    req.user = user;
 
-const user = await User.findById(decoded.id)
-.select("-password");
+    console.log("PROTECT DEBUG:", {
+      userId: req.user._id,
+      userEmail: req.user.email,
+      userRole: req.user.role
+    });
 
+    next();
 
-if(!user){
-return res.status(401).json({
-message:"User not found"
-});
-}
+  } catch (error) {
+    console.error("AUTH ERROR:", error.message);
 
-
-req.user=user;
-
-next();
-
-
-}catch(error){
-
-res.status(401).json({
-message:"Unauthorized"
-});
-
-}
-
+    return res.status(401).json({
+      message: "Unauthorized"
+    });
+  }
 };

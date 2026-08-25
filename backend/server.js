@@ -7,12 +7,14 @@ import predictionRoutes from "./routes/predictionRoutes.js";
 import interactionRoutes from "./routes/interactionRoutes.js";
 import statsRoutes from "./routes/statsRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/api/users",userRoutes);
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
