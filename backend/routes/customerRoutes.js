@@ -1,11 +1,18 @@
 import { Router } from "express";
 
+import { protect } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
+
 import {
-  listCustomers,
-  getCustomerById,
-  addCustomer,
-  removeCustomer,
-  updateCustomer
+    listCustomers,
+    getCustomerById,
+    addCustomer,
+    removeCustomer,
+    updateCustomer,
+    getMyProfile,
+    updateMyProfile,
+    changeMyPassword,
+    createPortalLogin
 } from "../controllers/customerController.js";
 
 import { protect, authorize } from "../middleware/authMiddleware.js";

@@ -4,11 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import CustomerForm from "../components/CustomerForm.jsx";
 import { getCustomer, updateCustomer } from "../services/api.js";
 import ConfirmModal from "../components/ConfirmModal.jsx";
+import { useAuth } from "../context/AuthContext";
 
 export default function EditCustomer(){
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const base = user?.role === "admin" ? "/admin" : "/employee";
   const [showConfirm,setShowConfirm] = useState(false);
 
   const [customer,setCustomer] = useState(null);
@@ -39,7 +42,7 @@ export default function EditCustomer(){
 
       alert("Customer updated successfully");
 
-      navigate(`/customers/${id}`);
+      navigate(`${base}/customers/${id}`);
 
     }
     catch(error){

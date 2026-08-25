@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Home from "./pages/Home.jsx";
 import Customers from "./pages/Customers.jsx";
 import CustomerDetails from "./pages/CustomerDetails.jsx";
 import EditCustomer from "./pages/EditCustomer.jsx";
@@ -11,6 +10,11 @@ import Layout from "./components/Layout.jsx";
 import AdminLayout from "./components/layouts/AdminLayout.jsx";
 
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { useAuth } from "./context/AuthContext";
+
+import AdminLayout from "./components/layouts/AdminLayout.jsx";
+import EmployeeLayout from "./components/layouts/EmployeeLayout.jsx";
+import CustomerLayout from "./components/layouts/CustomerLayout.jsx";
 
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard.jsx";

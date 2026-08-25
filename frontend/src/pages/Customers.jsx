@@ -4,6 +4,8 @@ import { UserPlus } from "lucide-react";
 import CustomerTable from "../components/CustomerTable.jsx";
 import Loading from "../components/Loading.jsx";
 import ConfirmModal from "../components/ConfirmModal.jsx";
+import AddCustomerModal from "../components/AddCustomerModal";
+import {useAuth} from "../context/AuthContext";
 
 import {
   getCustomers,
@@ -14,6 +16,8 @@ import {
 
 export default function Customers() {
 
+  const [showAddModal,setShowAddModal]=useState(false);
+
   const [showConfirm,setShowConfirm] = useState(false);
   const [selectedCustomer,setSelectedCustomer] = useState(null);
   const [deleting,setDeleting] = useState(false);
@@ -23,22 +27,53 @@ export default function Customers() {
 
   const [showForm, setShowForm] = useState(false);
 
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
 
+  const load = async () => {
 
-  const load = () => {
+  try {
 
     setLoading(true);
 
-    getCustomers()
-      .then(setCustomers)
-      .finally(() => setLoading(false));
+    const data = await getCustomers();
 
-  };
+    setCustomers(data);
+
+  } catch(error) {
+
+    console.error(
+      "Customer loading failed:",
+      error
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
+
+  useEffect(()=>{
+
+    load();
+
+    },[]);
 
 
-  useEffect(load, []);
+  useEffect(() => {
+
+  setLoading(true);
+
+  getCustomers()
+    .then(setCustomers)
+    .catch((error) => {
+      console.error("Failed to load customers", error);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+
+}, []);
 
 
 
@@ -76,6 +111,30 @@ export default function Customers() {
   };
 
 
+  const handleAddCustomer = async(data)=>{
+
+
+    try{
+
+
+    await createCustomer(data);
+
+
+    setShowAddModal(false);
+
+
+    load();
+
+
+    }
+    catch(error){
+
+    console.log(error);
+
+    }
+
+    };
+
 
   // DELETE CUSTOMER
   const handleDelete = async()=>{
@@ -89,7 +148,8 @@ export default function Customers() {
         );
 
 
-        load();
+        getCustomers()
+        .then(setCustomers);
 
         }
         catch(error){
@@ -153,9 +213,7 @@ export default function Customers() {
 
         <button
           className="btn btn-primary"
-          onClick={() =>
-            setShowForm((s)=>!s)
-          }
+          onClick={()=>setShowAddModal(true)}
         >
 
           <UserPlus size={16}/>
@@ -287,6 +345,20 @@ export default function Customers() {
           }}
 
           onConfirm={handleDelete}
+
+          />
+
+          )
+          }
+
+          {
+          showAddModal && (
+
+          <AddCustomerModal
+
+          onClose={()=>setShowAddModal(false)}
+
+          onSave={handleAddCustomer}
 
           />
 

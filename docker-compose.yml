@@ -16,6 +16,8 @@ services:
 
   backend:
     build: ./backend
+    volumes:
+    - ./backend:/app
     container_name: churn-backend
     ports:
       - "5001:5000"

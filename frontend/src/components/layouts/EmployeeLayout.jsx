@@ -1,16 +1,15 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutGrid, Users, UserCog, BarChart3, Brain, LogOut } from "lucide-react";
+import { LayoutGrid, Users, Brain, MessagesSquare, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const links = [
-  { to: "/admin", label: "Dashboard", icon: LayoutGrid, end: true },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/employees", label: "Employees", icon: UserCog },
-  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/admin/predictions", label: "Predictions", icon: Brain }
+  { to: "/employee", label: "Dashboard", icon: LayoutGrid, end: true },
+  { to: "/employee/customers", label: "Customers", icon: Users },
+  { to: "/employee/predictions", label: "Predictions", icon: Brain },
+  { to: "/employee/interactions", label: "Interactions", icon: MessagesSquare }
 ];
 
-export default function AdminLayout() {
+export default function EmployeeLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +27,7 @@ export default function AdminLayout() {
           </span>
           <div style={{ lineHeight: 1.15 }}>
             <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15 }}>Signal</div>
-            <div style={{ fontSize: 10.5, opacity: 0.6, fontFamily: "var(--font-mono)" }}>ADMIN CONSOLE</div>
+            <div style={{ fontSize: 10.5, opacity: 0.6, fontFamily: "var(--font-mono)" }}>EMPLOYEE DESK</div>
           </div>
         </div>
 

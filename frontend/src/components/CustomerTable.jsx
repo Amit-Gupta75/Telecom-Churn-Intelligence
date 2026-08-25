@@ -101,7 +101,7 @@ export default function CustomerTable({ customers = [], onDelete }) {
 
             <button
               onClick={() =>
-                navigate(`/customers/${c._id || c.id}`)
+                navigate(`/employee/customers/${c._id || c.id}`)
               }
               className="icon-btn view-icon"
             >
@@ -121,7 +121,7 @@ export default function CustomerTable({ customers = [], onDelete }) {
 
             <button
               onClick={() =>
-                navigate(`/customers/${c._id || c.id}/edit`)
+                navigate(`/employee/customers/${c._id || c.id}/edit`)
               }
               className="icon-btn edit-icon"
             >
