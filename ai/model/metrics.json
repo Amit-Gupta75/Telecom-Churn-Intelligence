@@ -1,7 +1,21 @@
 {
-  "version": "1.0.0",
-  "auc": 0.6911,
-  "accuracy": 0.626,
+  "version": "2.0.0",
+  "bestModel": "LogisticRegression",
+  "bestAUC": 0.6914,
   "trainingRows": 7043,
-  "trainedAt": "2026-08-18T19:50:22.320262+00:00"
+  "trainedAt": "2026-08-21T17:45:01.846266+00:00",
+  "models": {
+    "LogisticRegression": {
+      "auc": 0.6914,
+      "accuracy": 0.7069
+    },
+    "RandomForest": {
+      "auc": 0.6911,
+      "accuracy": 0.626
+    },
+    "GradientBoosting": {
+      "auc": 0.6785,
+      "accuracy": 0.6962
+    }
+  }
 }

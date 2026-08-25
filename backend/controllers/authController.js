@@ -17,165 +17,172 @@ const generateToken = (user) => {
 };
 
 
-export const register = async (req,res)=>{
+export const register = async (req, res) => {
 
-try{
+  try {
 
-const {
-name,
-email,
-password,
-location,
-region
-}=req.body;
-
-
-const existing = await User.findOne({email});
-
-if(existing){
-return res.status(400).json({
-message:"User already exists"
-});
-}
+    const {
+      name,
+      email,
+      password,
+      role,
+      location,
+      region
+    } = req.body;
 
 
-const hashedPassword = await bcrypt.hash(password,10);
+    if (!name || !email || !password) {
+
+      return res.status(400).json({
+        message: "name, email and password are required"
+      });
+
+    }
 
 
-// Public registration always creates a "customer" role account.
-// Admin and employee accounts can only be created through the
-// protected /api/users/employees routes — role is never trusted
-// from the request body here.
-const user = await User.create({
-name,
-email,
-password:hashedPassword,
-role: "customer",
-location,
-region
-});
+    if (password.length < 6) {
+
+      return res.status(400).json({
+        message: "Password must be at least 6 characters"
+      });
+
+    }
 
 
-res.json({
-message:"Registration successful",
-token:generateToken(user),
-user:{
-id:user._id,
-name:user.name,
-email:user.email,
-role:user.role,
-location:user.location,
-region:user.region,
-customer:user.customer
-}
-});
+    const allowedRoles = ["customer", "employee", "admin"];
+
+    if (role && !allowedRoles.includes(role)) {
+
+      return res.status(400).json({
+        message: "Invalid role"
+      });
+
+    }
 
 
-}catch(error){
+    const existing = await User.findOne({ email });
 
-res.status(500).json({
-message:error.message
-});
+    if (existing) {
+      return res.status(400).json({
+        message: "User already exists"
+      });
+    }
 
-}
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || "customer",
+      location,
+      region
+    });
+
+
+    res.json({
+      message: "Registration successful",
+      token: generateToken(user),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+        region: user.region
+      }
+    });
+
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
+};
+
+
+
+export const login = async (req, res) => {
+
+  try {
+
+    const {
+      email,
+      password
+    } = req.body;
+
+
+    if (!email || !password) {
+
+      return res.status(400).json({
+        message: "email and password are required"
+      });
+
+    }
+
+
+    const user = await User.findOne({ email });
+
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid credentials"
+      });
+    }
+
+
+    const match = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+
+    if (!match) {
+      return res.status(401).json({
+        message: "Invalid credentials"
+      });
+    }
+
+
+
+    res.json({
+
+      token: generateToken(user),
+
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+        region: user.region
+      }
+
+    });
+
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
 
 };
 
 
 
-export const login = async(req,res)=>{
+export const getMe = async (req, res) => {
 
-try{
-
-const {
-email,
-password
-}=req.body;
-
-
-// First check User collection
-
-let account = await User.findOne({email});
-
-
-
-
-// If not found check Customer collection
-if(!account){
-
-account = await Customer.findOne({email});
-
-
-}
-
-
-if(!account){
-
-return res.status(401).json({
-message:"Invalid credentials"
-});
-
-}
-
-
-
-const match = await bcrypt.compare(
-password,
-account.password
-);
-
-
-
-if(!match){
-
-return res.status(401).json({
-message:"Invalid credentials"
-});
-
-}
-
-
-
-
-
-res.json({
-
-token:generateToken(account),
-
-user:{
-
-id:account._id,
-
-name:account.name,
-
-email:account.email,
-
-role:account.role,
-
-location:account.location,
-
-region:account.region
-
-}
-
-});
-
-
-}catch(error){
-
-res.status(500).json({
-message:error.message
-});
-
-}
-
-};
-
-
-export const getMe = async(req,res)=>{
-
-res.json({
-user:req.user
-});
+  res.json({
+    user: req.user
+  });
 
 };

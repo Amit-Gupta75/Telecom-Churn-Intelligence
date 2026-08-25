@@ -15,88 +15,22 @@ import {
     createPortalLogin
 } from "../controllers/customerController.js";
 
+import { protect, authorize } from "../middleware/authMiddleware.js";
+
 
 const router = Router();
 
+// Any logged-in user (admin/employee/customer) can view customers.
+router.get("/", protect, listCustomers);
 
-// Admin + Employee can view customers
-router.get(
-    "/",
-    protect,
-    authorize("admin","employee"),
-    listCustomers
-);
+router.get("/:id", protect, getCustomerById);
 
+// Only admin/employee can create, update or delete customer records.
+router.post("/", protect, authorize("admin", "employee"), addCustomer);
 
-// Customer viewing their own linked record — must be registered
-// before "/:id" so "me" isn't swallowed as an id param.
-router.get(
-    "/me",
-    protect,
-    authorize("customer"),
-    getMyProfile
-);
+router.put("/:id", protect, authorize("admin", "employee"), updateCustomer);
 
-
-// Customer self-service: update own contact details / change own password
-router.patch(
-    "/me",
-    protect,
-    authorize("customer"),
-    updateMyProfile
-);
-
-
-router.post(
-    "/me/password",
-    protect,
-    authorize("customer"),
-    changeMyPassword
-);
-
-
-router.get(
-    "/:id",
-    protect,
-    authorize("admin","employee"),
-    getCustomerById
-);
-
-
-// Admin creates a portal login for a customer, linking it to this record
-router.post(
-    "/:id/portal-login",
-    protect,
-    authorize("admin"),
-    createPortalLogin
-);
-
-
-// Admin + Employee can create customers
-router.post(
-    "/",
-    protect,
-    authorize("admin","employee"),
-    addCustomer
-);
-
-
-// Admin + Employee can edit customers
-router.put(
-    "/:id",
-    protect,
-    authorize("admin","employee"),
-    updateCustomer
-);
-
-
-// Admin + Employee can delete customers
-router.delete(
-    "/:id",
-    protect,
-    authorize("admin","employee"),
-    removeCustomer
-);
+router.delete("/:id", protect, authorize("admin", "employee"), removeCustomer);
 
 
 export default router;

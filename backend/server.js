@@ -22,6 +22,21 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/predictions", predictionRoutes);
 app.use("/api/interactions", interactionRoutes);
 app.use("/api/stats", statsRoutes);
+
+// 404 handler — any unmatched /api/* route
+app.use("/api", (_req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Centralized error handler (catches errors passed via next(err),
+// malformed JSON bodies, etc.)
+app.use((err, _req, res, _next) => {
+  console.error("Unhandled error:", err);
+  res.status(err.status || 500).json({
+    error: err.message || "Internal server error"
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/churnDB";
 

@@ -1,67 +1,70 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import Customer from "../models/Customer.js";
 
-export const protect = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({
-        message: "No token"
-      });
-    }
+export const protect = async(req,res,next)=>{
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "secretkey"
-    );
+try{
 
-    let user;
+const token = req.headers.authorization?.split(" ")[1];
 
-    // Customer accounts are stored in Customer collection.
-    if (decoded.role === "customer") {
-      user = await Customer.findById(decoded.id)
-        .select("-password");
 
-      if (!user) {
-        return res.status(401).json({
-          message: "Customer not found"
-        });
-      }
+if(!token){
+return res.status(401).json({
+message:"No token"
+});
+}
 
-      // Keep the role available to authorize()
-      user = {
-        ...user.toObject(),
-        role: "customer"
-      };
-    } else {
-      // Admin / employee accounts are stored in User collection.
-      user = await User.findById(decoded.id)
-        .select("-password");
 
-      if (!user) {
-        return res.status(401).json({
-          message: "User not found"
-        });
-      }
-    }
+const decoded = jwt.verify(
+token,
+process.env.JWT_SECRET || "secretkey"
+);
 
-    req.user = user;
 
-    console.log("PROTECT DEBUG:", {
-      userId: req.user._id,
-      userEmail: req.user.email,
-      userRole: req.user.role
-    });
+const user = await User.findById(decoded.id)
+.select("-password");
 
-    next();
 
-  } catch (error) {
-    console.error("AUTH ERROR:", error.message);
+if(!user){
+return res.status(401).json({
+message:"User not found"
+});
+}
 
+
+req.user=user;
+
+next();
+
+
+}catch(error){
+
+res.status(401).json({
+message:"Unauthorized"
+});
+
+}
+
+};
+
+
+// Role-based access control. Use after `protect` so req.user is populated.
+// Example: router.delete("/:id", protect, authorize("admin"), removeCustomer)
+export const authorize = (...roles) => (req, res, next) => {
+
+  if (!req.user) {
     return res.status(401).json({
       message: "Unauthorized"
     });
   }
+
+  if (!roles.includes(req.user.role)) {
+    return res.status(403).json({
+      message: "You do not have permission to perform this action"
+    });
+  }
+
+  next();
+
 };
