@@ -1,5 +1,7 @@
 import Customer from "../models/Customer.js";
 import User from "../models/User.js";
+import Interaction from "../models/Interaction.js";
+import Prediction from "../models/Prediction.js";
 import bcrypt from "bcrypt";
 
 export const listCustomers = async (_req, res) => {
@@ -76,6 +78,15 @@ export const removeCustomer = async (req, res) => {
       return res.status(404).json({ error: "Customer not found" });
     }
 
+    // Cascade delete — otherwise interactions/predictions for this customer
+    // are left behind as orphaned records, and any portal-login account
+    // that was linked to this customer keeps pointing at a deleted record.
+    await Promise.all([
+      Interaction.deleteMany({ customer: customer._id }),
+      Prediction.deleteMany({ customer: customer._id }),
+      User.deleteMany({ customer: customer._id, role: "customer" })
+    ]);
+
     res.json({ message: "Customer deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -116,13 +127,19 @@ export const getMyProfile = async (req, res) => {
 // billing and churn data can't be touched through this endpoint.
 export const updateMyProfile = async (req, res) => {
   try {
+    if (!req.user.customer) {
+      return res.status(404).json({
+        message: "No customer profile linked to this account yet"
+      });
+    }
+
     const { name, phone, location } = req.body;
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
     if (location !== undefined) updates.location = location;
 
-    const customer = await Customer.findByIdAndUpdate(req.user._id, updates, {
+    const customer = await Customer.findByIdAndUpdate(req.user.customer, updates, {
       new: true
     }).select("-password");
 
@@ -140,12 +157,18 @@ export const updateMyProfile = async (req, res) => {
 // own password after verifying the current one.
 export const changeMyPassword = async (req, res) => {
   try {
+    if (!req.user.customer) {
+      return res.status(404).json({
+        message: "No customer profile linked to this account yet"
+      });
+    }
+
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ message: "Current and new password are required" });
     }
 
-    const customer = await Customer.findById(req.user._id);
+    const customer = await Customer.findById(req.user.customer);
     if (!customer || !customer.password) {
       return res.status(404).json({ message: "Customer profile not found" });
     }

@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import { Users, UserCog, AlertTriangle, TrendingUp, Eye, Pencil, Trash2 } from "lucide-react";
 
-import { getCustomers, getEmployees, getStats, deleteCustomer } from "../../services/api";
+import { getCustomers, getEmployees, getStats, deleteCustomer } from "../../services/api.js";
 import Loading from "../../components/Loading.jsx";
 
 const COLORS = { low: "#1FB6A6", medium: "#F2A445", high: "#E4536B" };

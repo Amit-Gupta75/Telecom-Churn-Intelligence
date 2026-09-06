@@ -68,9 +68,35 @@ export const getPredictionHistory = (customerId) =>
 export const getInteractions = (customerId) =>
   api.get(`/interactions/${customerId}`).then((r) => r.data);
 export const addInteraction = (data) => api.post("/interactions", data).then((r) => r.data);
+export const getAllInteractions = () => api.get("/interactions").then((r) => r.data);
+// A logged-in customer raising their own complaint hits the same endpoint
+// as addInteraction — kept as a separate export so customer-facing pages
+// read clearly.
+export const raiseComplaint = (data) => api.post("/interactions", data).then((r) => r.data);
+
+// All predictions across customers (admin/employee)
+export const getAllPredictions = () => api.get("/predictions").then((r) => r.data);
 
 // Stats / model status
 export const getStats = () => api.get("/stats").then((r) => r.data);
+
+// Logged-in customer's own profile
+export const getMyProfile = () => api.get("/customers/me").then((r) => r.data);
+export const updateMyProfile = (data) =>
+  api.patch("/customers/me", data).then((r) => r.data);
+export const changeMyPassword = (data) =>
+  api.post("/customers/me/password", data).then((r) => r.data);
+
+// Admin/employee create a portal login for an existing customer record
+export const createPortalLogin = (id, data) =>
+  api.post(`/customers/${id}/portal-login`, data).then((r) => r.data);
+
+// Employees (admin only)
+export const getEmployees = () => api.get("/users/employees").then((r) => r.data);
+export const getEmployee = (id) => api.get(`/users/employees/${id}`).then((r) => r.data);
+export const createEmployee = (data) => api.post("/users/employees", data).then((r) => r.data);
+export const deleteEmployee = (id) =>
+  api.delete(`/users/employees/${id}`).then((r) => r.data);
 
 
 //Delete Customer

@@ -358,7 +358,7 @@ export default function Customers() {
 
           onClose={()=>setShowAddModal(false)}
 
-          onSave={handleAddCustomer}
+          onCreate={handleAddCustomer}
 
           />
 

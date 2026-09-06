@@ -72,7 +72,9 @@ export const allPredictions = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("customer", "name location");
 
-    res.json(predictions);
+    // Skip predictions whose customer record no longer exists (e.g. deleted
+    // before cascade-delete was in place) instead of showing "Deleted customer".
+    res.json(predictions.filter((p) => p.customer));
 
   } catch (error) {
     res.status(500).json({

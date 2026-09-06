@@ -19,7 +19,10 @@ export const listAllInteractions = async (req, res) => {
     const items = await Interaction.find()
       .sort({ occurredAt: -1 })
       .populate("customer", "name location");
-    res.json(items);
+
+    // Skip interactions whose customer record no longer exists (e.g. deleted
+    // before cascade-delete was in place) instead of showing "Deleted customer".
+    res.json(items.filter((i) => i.customer));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
