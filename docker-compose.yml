@@ -1,49 +1,42 @@
-version: "3.9"
-
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
     container_name: churn-frontend
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:5001/api
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
   backend:
     build: ./backend
-    volumes:
-    - ./backend:/app
     container_name: churn-backend
     ports:
-      - "5001:5000"
+      - "5000:5000"
     environment:
       - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/churnDB
+      - MONGO_URI=${MONGO_URI}
       - AI_SERVICE_URL=http://ai:8000
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey2024}
+      - PASSWORD=${PASSWORD}
     depends_on:
-      - mongo
       - ai
+    restart: unless-stopped
 
   ai:
     build: ./ai
     container_name: churn-ai
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-
-  mongo:
-    image: mongo:7
-    container_name: churn-mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped

@@ -10,7 +10,6 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    role: "employee",
   });
 
   const [error, setError] = useState("");
@@ -130,29 +129,6 @@ export default function Register() {
             value={form.password}
             onChange={update("password")}
           />
-        </div>
-
-        {/* Role */}
-        <div
-          className="field"
-          style={{
-            marginTop: 15,
-          }}
-        >
-          <label>Role</label>
-
-          <select
-            value={form.role}
-            onChange={update("role")}
-          >
-            <option value="employee">
-              Employee
-            </option>
-
-            <option value="admin">
-              Admin
-            </option>
-          </select>
         </div>
 
         {/* Error */}
