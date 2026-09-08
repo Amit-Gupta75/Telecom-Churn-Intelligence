@@ -2,7 +2,13 @@
 node_modules/
 dist/
 build/
+
+# Env files — never commit real secrets
 .env
+.env.local
+ai/.env
+backend/.env
+frontend/.env
 
 # Python
 __pycache__/
@@ -13,6 +19,13 @@ venv/
 
 # Data
 ai/data/processed/*.csv
+
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/tfplan
+terraform/.terraform.lock.hcl
 
 # OS
 .DS_Store

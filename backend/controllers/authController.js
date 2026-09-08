@@ -49,14 +49,13 @@ export const register = async (req, res) => {
     }
 
 
-    const allowedRoles = ["customer", "employee", "admin"];
-
-    if (role && !allowedRoles.includes(role)) {
-
-      return res.status(400).json({
-        message: "Invalid role"
+    // Only customers can self-register.
+    // Employees are created by admin via POST /users/employees.
+    // Admins are seeded directly — never via public register.
+    if (role && role !== "customer") {
+      return res.status(403).json({
+        message: "You cannot register with this role"
       });
-
     }
 
 
@@ -76,7 +75,7 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || "customer",
+      role: "customer",
       location,
       region
     });

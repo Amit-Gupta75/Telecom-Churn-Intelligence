@@ -1,25 +1,16 @@
 """
 Response Agent
----------------
-Orchestrates reason_agent + retention_agent into the final payload the
-backend/frontend expects, and is responsible for the shape/contract of
-that payload staying stable even if the underlying agents change.
-"""
-import sys
-import os
+--------------
+Public entry point for the AI pipeline.
+Delegates to the LangGraph churn pipeline (agents/graph.py) which runs:
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from agents.reason_agent import explain
-from agents.retention_agent import recommend
+  score → explain → recommend → END
+
+The response shape is unchanged so the FastAPI endpoint and frontend
+don't need any modifications.
+"""
+from agents.graph import run_pipeline
 
 
 def build_response(probability: float, factors: list, profile: dict) -> dict:
-    summary = explain(probability, factors)
-    offers = recommend(probability, factors, profile)
-
-    return {
-        "probability": probability,
-        "factors": factors,
-        "summary": summary,
-        "offers": offers,
-    }
+    return run_pipeline(probability, factors, profile)

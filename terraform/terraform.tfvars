@@ -1,0 +1,9 @@
+aws_region    = "ap-south-1"
+instance_type = "t3.small"
+repo_url      = "https://github.com/Amit-Gupta75/Telecom-Churn-Intelligence.git"
+
+# ── Sensitive values — set via env vars, never commit real values ─────────
+# gemini_api_key = "..."   # export TF_VAR_gemini_api_key=...
+# mongo_uri      = "..."   # export TF_VAR_mongo_uri=...
+# db_password    = "..."   # export TF_VAR_db_password=...
+# ssh_public_key = "..."   # export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_rsa.pub)"
