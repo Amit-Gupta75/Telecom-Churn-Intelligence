@@ -872,7 +872,3 @@ This README retains the original project scope and implementation details:
 
 **Built with:** React • Node.js • Express • FastAPI • scikit-learn • LangGraph • Gemini • SHAP • MongoDB Atlas • Docker • GitHub Actions • AWS • Terraform
 
-## Contributors
-
-- Amit Gupta
-- Aman Kumar Verma
