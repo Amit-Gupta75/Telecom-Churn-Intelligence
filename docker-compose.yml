@@ -11,20 +11,7 @@ services:
       - backend
     restart: unless-stopped
 
-  backend:
-    build: ./backend
-    container_name: churn-backend
-    ports:
-      - "5000:5000"
-    environment:
-      - PORT=5000
-      - MONGO_URI=${MONGO_URI}
-      - AI_SERVICE_URL=http://ai:8000
-      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey2024}
-      - PASSWORD=${PASSWORD}
-    depends_on:
-      - ai
-    restart: unless-stopped
+  
 
   ai:
     build: ./ai
@@ -40,3 +27,33 @@ services:
       retries: 12
       start_period: 60s
     restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: churn-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - churn-mongo-data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: churn-backend
+    ports:
+      - "5001:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/churnDB
+      - AI_SERVICE_URL=http://ai:8000
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey2024}
+      - PASSWORD=${PASSWORD}
+    depends_on:
+      - mongo
+      - ai
+    restart: unless-stopped
+
+volumes:
+  churn-mongo-data:
+    
+
+  

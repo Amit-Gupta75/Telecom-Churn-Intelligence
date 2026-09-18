@@ -202,7 +202,9 @@ export const createPortalLogin = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const existing = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return res.status(400).json({ message: "A login with this email already exists" });
     }
@@ -216,7 +218,7 @@ export const createPortalLogin = async (req, res) => {
 
     const user = await User.create({
       name: customer.name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       role: "customer",
       location: customer.location,

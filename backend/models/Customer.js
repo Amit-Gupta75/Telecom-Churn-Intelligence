@@ -125,7 +125,9 @@ churnProbability: {
 email:{
  type:String,
  unique:true,
- sparse:true
+ sparse:true,
+ lowercase:true,
+ trim:true
 },
 
 phone:{
